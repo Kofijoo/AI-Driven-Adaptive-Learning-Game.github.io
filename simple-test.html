@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puffy Test</title>
+    <style>
+        body { margin: 0; background: black; color: white; font-family: Arial; }
+        canvas { width: 100%; height: 100vh; }
+        #info { position: absolute; top: 10px; left: 10px; }
+        #dialogue { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); 
+                   background: rgba(255,255,255,0.9); color: black; padding: 15px; border-radius: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="info">Loading Babylon.js...</div>
+    <div id="dialogue"></div>
+    <canvas id="canvas"></canvas>
+    
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script>
+        document.getElementById('info').innerHTML = 'Babylon.js loaded. Creating scene...';
+        
+        const canvas = document.getElementById('canvas');
+        const engine = new BABYLON.Engine(canvas, true);
+        
+        const scene = new BABYLON.Scene(engine);
+        scene.createDefaultCameraOrLight(true, true, true);
+        
+        // Simple sphere for Puffy
+        const puffy = BABYLON.MeshBuilder.CreateSphere('puffy', {diameter: 2}, scene);
+        puffy.position.y = 1;
+        puffy.position.x = 2;
+        
+        // Make it blue
+        const material = new BABYLON.StandardMaterial('mat', scene);
+        material.diffuseColor = new BABYLON.Color3(0.5, 0.8, 1);
+        puffy.material = material;
+        
+        document.getElementById('info').innerHTML = 'Scene created. Click the blue sphere!';
+        
+        // Click handler
+        scene.onPointerObservable.add((info) => {
+            if (info.pickInfo.hit && info.pickInfo.pickedMesh === puffy) {
+                const dialogue = document.getElementById('dialogue');
+                dialogue.innerHTML = "Hi! I'm Puffy! Click me again!";
+                dialogue.style.display = 'block';
+                setTimeout(() => dialogue.style.display = 'none', 2000);
+            }
+        });
+        
+        // Render
+        engine.runRenderLoop(() => scene.render());
+        window.addEventListener('resize', () => engine.resize());
+        
+        console.log('Everything loaded');
+    </script>
+</body>
+</html>

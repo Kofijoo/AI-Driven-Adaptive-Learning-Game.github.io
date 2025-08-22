@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Explorers VR Lab - Test</title>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        #renderCanvas { width: 100%; height: 100vh; touch-action: none; }
+        #ui-overlay { position: absolute; top: 20px; left: 20px; z-index: 100; color: white; }
+        .character-dialogue { 
+            position: absolute; 
+            bottom: 100px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 15px;
+            max-width: 400px;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <div id="ui-overlay">
+        <div>Little Explorers VR Lab - Test</div>
+        <div id="vr-status">Loading...</div>
+    </div>
+    <div id="character-dialogue" class="character-dialogue" style="display: none;"></div>
+    
+    <script>
+        // Simple test version with CDN Babylon.js
+        const canvas = document.getElementById('renderCanvas');
+        const engine = new BABYLON.Engine(canvas, true);
+        
+        const createScene = () => {
+            const scene = new BABYLON.Scene(engine);
+            
+            // Camera
+            const camera = new BABYLON.ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 2.5, 10, BABYLON.Vector3.Zero(), scene);
+            camera.attachControls(canvas, true);
+            
+            // Light
+            const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+            
+            // Ground
+            const ground = BABYLON.MeshBuilder.CreateGround('ground', { size: 20 }, scene);
+            const groundMaterial = new BABYLON.StandardMaterial('groundMat', scene);
+            groundMaterial.diffuseColor = new BABYLON.Color3(0.4, 0.8, 0.4);
+            ground.material = groundMaterial;
+            
+            // Puffy character
+            const puffy = BABYLON.MeshBuilder.CreateSphere('puffy', { diameter: 2 }, scene);
+            puffy.position = new BABYLON.Vector3(3, 2, 0);
+            
+            const puffyMaterial = new BABYLON.StandardMaterial('puffyMat', scene);
+            puffyMaterial.diffuseColor = new BABYLON.Color3(0.9, 0.9, 1.0);
+            puffyMaterial.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.2);
+            puffy.material = puffyMaterial;
+            
+            // Floating animation
+            const animationKeys = [];
+            animationKeys.push({ frame: 0, value: 2 });
+            animationKeys.push({ frame: 60, value: 2.5 });
+            animationKeys.push({ frame: 120, value: 2 });
+            
+            const floatAnimation = new BABYLON.Animation('puffyFloat', 'position.y', 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+            floatAnimation.setKeys(animationKeys);
+            
+            puffy.animations.push(floatAnimation);
+            scene.beginAnimation(puffy, 0, 120, true);
+            
+            // Click interaction
+            scene.onPointerObservable.add((pointerInfo) => {
+                if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh?.name === 'puffy') {
+                    showDialogue();
+                }
+            });
+            
+            return scene;
+        };
+        
+        const responses = [
+            "Hello! I'm Puffy, your science guide!",
+            "What would you like to explore today?",
+            "I love watching you discover new things!",
+            "That's so interesting! What do you notice?",
+            "Great job exploring! What happens next?"
+        ];
+        
+        const showDialogue = () => {
+            const dialogueElement = document.getElementById('character-dialogue');
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            dialogueElement.textContent = randomResponse;
+            dialogueElement.style.display = 'block';
+            
+            setTimeout(() => {
+                dialogueElement.style.display = 'none';
+            }, 3000);
+        };
+        
+        // Initialize
+        const scene = createScene();
+        document.getElementById('vr-status').textContent = 'Click Puffy to interact!';
+        
+        // Initial greeting
+        setTimeout(() => {
+            showDialogue();
+        }, 2000);
+        
+        // Render loop
+        engine.runRenderLoop(() => {
+            scene.render();
+        });
+        
+        window.addEventListener('resize', () => {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>
