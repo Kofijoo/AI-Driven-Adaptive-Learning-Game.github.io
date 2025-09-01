@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Little Explorers VR Lab</title>
+    <title>Virtual Reality - WebXR Educational Platform</title>
+    <meta name="description" content="Immersive WebXR educational platform with AI-powered interactive characters for learning">
+    <meta name="keywords" content="WebXR, VR, education, 3D, AI, interactive learning">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4CAF50">
     <style>
         body { margin: 0; padding: 0; overflow: hidden; font-family: Arial, sans-serif; 
                background: linear-gradient(135deg, #87CEEB, #98FB98); }
@@ -39,20 +43,25 @@
         .character-name { font-size: 16px; font-weight: bold; color: #2E8B57; }
         input { padding: 8px; border-radius: 5px; border: none; margin: 5px; width: 200px; }
         button { padding: 8px 15px; border-radius: 8px; border: none; background: #4CAF50; 
-                color: white; cursor: pointer; margin: 5px; }
+                color: white; cursor: pointer; margin: 5px; transition: background 0.3s; }
         button:hover { background: #45a049; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        input:focus { outline: 2px solid #4CAF50; }
+        .loading { opacity: 0.7; pointer-events: none; }
     </style>
 </head>
 <body>
     <canvas id="renderCanvas"></canvas>
     
     <div id="ui-overlay">
-        <div><strong>🧪 Little Explorers VR Lab</strong></div>
+        <div><strong>🥽 Virtual Reality Platform</strong></div>
         <div id="vr-status">Loading...</div>
         <div style="margin-top: 10px;">
-            <input type="password" id="api-key-input" placeholder="DeepSeek API Key">
+            <input type="password" id="api-key-input" placeholder="DeepSeek API Key" maxlength="100" autocomplete="off">
             <button onclick="setApiKey()">Set API Key</button>
         </div>
+        <div id="error-message" style="color: #ff6b6b; margin-top: 10px; display: none;"></div>
+        <div id="success-message" style="color: #51cf66; margin-top: 10px; display: none;"></div>
     </div>
     
     <div id="character-info">
@@ -65,10 +74,32 @@
     
     <!-- Load Babylon.js from CDN -->
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script>
+        // Service Worker registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed'));
+            });
+        }
+    </script>
     
     <!-- Load our classes -->
     <script src="src/services/AIService.js"></script>
     <script src="src/characters/CharacterManager.js"></script>
     <script src="src/index.js"></script>
+    
+    <script>
+        // Initialize app after all scripts load
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                window.app = new VirtualRealityApp();
+            } catch (error) {
+                console.error('App initialization failed:', error);
+                document.getElementById('vr-status').textContent = 'Initialization failed - Please refresh';
+            }
+        });
+    </script>
 </body>
 </html>

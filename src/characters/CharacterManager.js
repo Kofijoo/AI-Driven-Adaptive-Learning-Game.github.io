@@ -37,7 +37,7 @@ class CharacterManager {
         
         // Initial greeting
         setTimeout(() => {
-            this.showCharacterDialogue("Welcome to Little Explorers Lab!", "Click on Dr. Maya (pink), Alex (blue), or Luna (yellow) to start chatting! 🧪✨");
+            this.showCharacterDialogue("Welcome to Virtual Reality!", "Click on Dr. Maya (pink), Alex (blue), or Luna (yellow) to start chatting! 🥽✨");
         }, 2000);
     }
 

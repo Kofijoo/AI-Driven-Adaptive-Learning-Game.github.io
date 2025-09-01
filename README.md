@@ -1,20 +1,42 @@
-# Little Explorers
+# Virtual Reality
 
-A project dedicated to helping children learn and explore their world.
+A production-ready WebXR educational platform with AI-powered interactive characters.
 
-## Description
+## Features
 
-Little Explorers is an educational project that aims to make learning fun and interactive for young minds.
+- 🥽 WebXR support for VR headsets
+- 🖥️ Desktop browser compatibility  
+- 🤖 AI-powered interactive characters
+- 🎨 Immersive 3D environments
+- 📱 Progressive Web App (PWA)
+- ⚡ Fast loading with optimized assets
 
-## Installation
+## Quick Start
 
 1. Clone the repository
-2. Install dependencies
-3. Run the application
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+4. Open browser to `http://localhost:3000`
 
-## Usage
+## Production Build
 
-Detailed usage instructions will be added as the project develops.
+```bash
+npm run build
+npm run preview
+```
+
+## Configuration
+
+1. Copy `.env.example` to `.env`
+2. Add your DeepSeek API key
+3. Configure environment variables as needed
+
+## Browser Support
+
+- Chrome 79+
+- Firefox 70+
+- Safari 14+
+- Edge 79+
 
 ## License
 

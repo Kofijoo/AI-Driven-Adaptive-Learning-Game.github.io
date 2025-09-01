@@ -1,6 +1,8 @@
 class AIService {
     constructor() {
         this.deepseekApiKey = null;
+        this.apiEndpoint = 'https://api.deepseek.com/v1/chat/completions';
+        this.requestTimeout = 15000;
         
         // Character personalities for 4-7 year olds
         this.characterPrompts = {
@@ -11,8 +13,13 @@ class AIService {
     }
 
     setApiKey(deepseekKey) {
-        this.deepseekApiKey = deepseekKey;
-        console.log('API key set in AIService');
+        if (!deepseekKey || typeof deepseekKey !== 'string' || deepseekKey.trim().length === 0) {
+            console.warn('Invalid API key provided');
+            return false;
+        }
+        this.deepseekApiKey = deepseekKey.trim();
+        console.log('API key configured successfully');
+        return true;
     }
 
     async generateCharacterResponse(characterId, context = 'greeting') {
@@ -31,9 +38,9 @@ class AIService {
             console.log('Making API call to DeepSeek...');
             
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), this.requestTimeout);
             
-            const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            const response = await fetch(this.apiEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

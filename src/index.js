@@ -1,12 +1,20 @@
-class LittleExplorersApp {
+class VirtualRealityApp {
     constructor() {
-        this.canvas = document.getElementById('renderCanvas');
-        this.engine = new BABYLON.Engine(this.canvas, true);
-        this.scene = null;
-        this.characterManager = null;
-        this.aiService = new AIService();
-        
-        this.init();
+        try {
+            this.canvas = document.getElementById('renderCanvas');
+            this.engine = new BABYLON.Engine(this.canvas, true, {
+                adaptToDeviceRatio: true,
+                powerPreference: 'high-performance'
+            });
+            this.scene = null;
+            this.characterManager = null;
+            this.aiService = new AIService();
+            
+            this.init();
+        } catch (error) {
+            console.error('Initialization error:', error);
+            this.showError('Failed to initialize application');
+        }
     }
 
     async init() {
@@ -18,7 +26,7 @@ class LittleExplorersApp {
         this.characterManager = new CharacterManager(this.scene, this.aiService);
         this.characterManager.init();
         
-        console.log('Little Explorers VR Lab initialized');
+        console.log('Virtual Reality Platform initialized');
     }
 
     async createScene() {
@@ -42,14 +50,16 @@ class LittleExplorersApp {
     async setupVR() {
         try {
             const xr = await BABYLON.WebXRDefaultExperience.CreateAsync(this.scene, {
-                floorMeshes: [this.scene.getMeshByName('ground')]
+                floorMeshes: [this.scene.getMeshByName('ground')],
+                requiredFeatures: ['local-floor'],
+                optionalFeatures: ['hand-tracking', 'hit-test']
             });
             
-            document.getElementById('vr-status').textContent = 'VR Ready - Click Enter VR';
+            this.updateStatus('VR Ready - Click Enter VR');
             console.log('WebXR initialized successfully');
         } catch (error) {
-            document.getElementById('vr-status').textContent = 'VR not available - Desktop mode';
-            console.log('WebXR not available, running in desktop mode');
+            console.error('WebXR error:', error);
+            this.updateStatus('VR not available - Desktop mode active');
         }
     }
 
@@ -63,23 +73,51 @@ class LittleExplorersApp {
         });
     }
 
-    // Method to set API key from UI
     setApiKey(apiKey) {
-        this.aiService.setApiKey(apiKey);
-        console.log('API key configured');
+        const success = this.aiService.setApiKey(apiKey);
+        if (success) {
+            this.showSuccess('API key configured successfully!');
+        } else {
+            this.showError('Invalid API key. Please check and try again.');
+        }
+    }
+    
+    updateStatus(message) {
+        const statusEl = document.getElementById('vr-status');
+        if (statusEl) statusEl.textContent = message;
+    }
+    
+    showError(message) {
+        const errorEl = document.getElementById('error-message');
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    }
+    
+    showSuccess(message) {
+        const successEl = document.getElementById('success-message');
+        if (successEl) {
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            setTimeout(() => successEl.style.display = 'none', 3000);
+        }
     }
 }
 
 // Global function for UI
 function setApiKey() {
-    const apiKey = document.getElementById('api-key-input').value;
-    if (window.app && apiKey) {
+    const apiKey = document.getElementById('api-key-input').value.trim();
+    if (!apiKey) {
+        window.app?.showError('Please enter an API key');
+        return;
+    }
+    if (window.app) {
         window.app.setApiKey(apiKey);
-        alert('API key set! Now click characters to chat! 🎉');
     }
 }
 
-// Start the application when page loads
-window.addEventListener('load', () => {
-    window.app = new LittleExplorersApp();
-});
+// Make function globally available
+window.setApiKey = setApiKey;
+
+// App will be initialized by HTML script
