@@ -1,7 +1,8 @@
 class CharacterManager {
-    constructor(scene, aiService) {
+    constructor(scene, aiService, assessmentEngine) {
         this.scene = scene;
         this.aiService = aiService;
+        this.assessmentEngine = assessmentEngine;
         this.characters = {};
         this.currentCharacter = null;
         
@@ -88,6 +89,11 @@ class CharacterManager {
                 if (charId) {
                     this.selectCharacter(charId);
                     this.startConversation(charId);
+                    
+                    // Track learning interaction
+                    if (window.app && window.app.trackLearningInteraction) {
+                        window.app.trackLearningInteraction('character_click', charId);
+                    }
                 }
             }
         });
