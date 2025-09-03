@@ -16,7 +16,6 @@ A production-ready WebXR educational platform with AI-powered interactive charac
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Start development server: `npm run dev`
-4. Open browser to `http://localhost:3000`
 
 ## Production Build
 
